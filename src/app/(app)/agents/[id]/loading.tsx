@@ -1,3 +1,3 @@
-import { GenericPageSkeleton } from "@/app/app-skeletons";
+import { AgentPageSkeleton } from "@/app/app-skeletons";
 
-export default GenericPageSkeleton;
+export default AgentPageSkeleton;

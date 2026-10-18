@@ -15,8 +15,10 @@ import {
 import {
   isSourcedByLeadsOnlyAgent,
   listAgents,
+  listAgentLeads,
   listCampaignEnrollments,
   listCampaigns,
+  listEnrollmentsForLeads,
   getLeadsByIds,
   getOutreachConversationFactsByLeadIds,
   listGroups,
@@ -77,18 +79,28 @@ export async function listScheduledActions(
   // workspace-wide path reads every enrolled lead and took 14-60s on big
   // workspaces, which is what left /leads stuck on "Loading outreach".
   const leadId = filters.leadId;
-  const [campaigns, enrollments, agents, groups, leadOnly, leadFacts] = await Promise.all([
+  // One agent (/agents/[id]) starts from the leads it sourced and reads only
+  // their enrollments. Filtering the workspace-wide path down instead took 26s
+  // on a 6k-enrollment workspace to show an agent's 3 actions.
+  const agentLeads = !leadId && filters.agentId
+    ? listAgentLeads(workspaceId, filters.agentId)
+    : undefined;
+  const [campaigns, enrollments, agents, groups, scopedLeads, leadFacts] = await Promise.all([
     listCampaigns(workspaceId),
-    leadId ? listLeadEnrollments(workspaceId, leadId) : listCampaignEnrollments(workspaceId),
+    leadId
+      ? listLeadEnrollments(workspaceId, leadId)
+      : agentLeads
+        ? agentLeads.then((leads) => listEnrollmentsForLeads(workspaceId, leads.map((lead) => lead.id)))
+        : listCampaignEnrollments(workspaceId),
     listAgents(workspaceId),
     listGroups(workspaceId),
-    leadId ? getLeadsByIds(workspaceId, [leadId]) : undefined,
+    leadId ? getLeadsByIds(workspaceId, [leadId]) : agentLeads,
     leadId ? getOutreachConversationFactsByLeadIds(workspaceId, [leadId]) : undefined,
   ]);
   // Only enrolled leads can produce an action, and there are at most as many of
   // them as there are enrollments. Scanning the whole leads collection here used
   // to pull 500 full documents and push this call past Firestore's 60s deadline.
-  const leads = leadOnly ?? await getLeadsByIds(
+  const leads = scopedLeads ?? await getLeadsByIds(
     workspaceId,
     enrollments.map((enrollment) => enrollment.leadId),
   );

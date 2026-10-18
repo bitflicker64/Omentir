@@ -618,3 +618,74 @@ export function GenericPageSkeleton() {
     </div>
   );
 }
+
+// Matches the agent page's queue (ActionsDashboard): the 4 stat cards, the
+// "Next actions" toolbar, the action list and the details panel.
+export function AgentActionsSkeleton() {
+  return (
+    <div className="app-x flex min-h-0 flex-1 flex-col gap-4 overflow-hidden" role="status" aria-label="Loading actions">
+      <div className="grid shrink-0 grid-cols-2 gap-3 lg:grid-cols-4">
+        {[0, 1, 2, 3].map((cell) => (
+          <div key={cell} className="m3-card m3-card-outlined p-4">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="mt-2 h-8 w-12" />
+          </div>
+        ))}
+      </div>
+      <div className="flex shrink-0 items-center justify-between gap-2">
+        <Skeleton className="h-5 w-28" />
+        <Skeleton className="h-8 w-36" />
+      </div>
+      <div className="grid min-h-0 flex-1 grid-rows-1 gap-4 overflow-hidden md:grid-rows-2 lg:grid-cols-[minmax(0,1fr)_360px] lg:grid-rows-1">
+        <div className="m3-card m3-card-elevated m3-card-lg flex min-h-0 flex-col overflow-hidden">
+          <Skeleton className="mx-4 mb-2 mt-4 h-3 w-16" />
+          {[0, 1, 2, 3, 4].map((row) => (
+            <div key={row} className="flex items-center gap-3 px-4 py-4">
+              <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+              <div className="min-w-0 flex-1">
+                <Skeleton className="h-3.5 w-36 max-w-full" />
+                <Skeleton className="mt-2 h-3 w-52 max-w-full" />
+                <Skeleton className="mt-2 h-3 w-44 max-w-full" />
+              </div>
+              <Skeleton className="h-3 w-14 shrink-0" />
+            </div>
+          ))}
+        </div>
+        <div className="m3-card m3-card-elevated m3-card-lg hidden min-h-0 p-5 md:block">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-11 w-11 shrink-0 rounded-full" />
+            <div className="min-w-0 flex-1">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="mt-2 h-3 w-40 max-w-full" />
+            </div>
+          </div>
+          <Skeleton className="mt-6 h-3 w-16" />
+          <Skeleton className="mt-3 h-1 w-full" />
+          <Skeleton className="mt-5 h-3 w-48 max-w-full" />
+          <Skeleton className="mt-3 h-3 w-40 max-w-full" />
+          <Skeleton className="mt-6 h-16 w-full" />
+          <Skeleton className="mt-3 h-9 w-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Route loading state for /agents/[id]: the page header, then the queue.
+export function AgentPageSkeleton() {
+  return (
+    <div className="flex h-full min-h-0 min-w-0 flex-col gap-4 overflow-hidden md:ml-4 md:mr-0.5 md:pb-3">
+      <div className="app-x flex shrink-0 items-start justify-between gap-3 pt-5 md:pt-6">
+        <div className="min-w-0 flex-1">
+          <Skeleton className="h-6 w-64 max-w-full" />
+          <Skeleton className="mt-3 h-3.5 w-80 max-w-full" />
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <Skeleton className="h-8 w-14" />
+          <Skeleton className="h-8 w-12" />
+        </div>
+      </div>
+      <AgentActionsSkeleton />
+    </div>
+  );
+}

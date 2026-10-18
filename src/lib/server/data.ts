@@ -2002,6 +2002,16 @@ export async function getLeadsByIds(workspaceId: string, ids: string[]): Promise
   return out;
 }
 
+// Every lead one agent sourced. Equality on both fields merges the automatic
+// single-field indexes, so no composite index is needed.
+export async function listAgentLeads(workspaceId: string, agentId: string): Promise<Lead[]> {
+  const snap = await collection<Lead>("leads")
+    .where("workspaceId", "==", workspaceId)
+    .where("sourceAgentId", "==", agentId)
+    .get();
+  return snap.docs.map((doc) => doc.data());
+}
+
 // Lightweight projection used for agent metrics. Selecting a single field makes
 // this ~2-3x faster than listLeads because it avoids transferring full lead
 // documents (which dominates the agents page load; see agents/page.tsx).
@@ -2981,6 +2991,26 @@ export async function listCampaignEnrollments(workspaceId: string) {
     .where("workspaceId", "==", workspaceId)
     .get();
   return snap.docs.map((doc) => doc.data());
+}
+
+// Enrollments of a known set of leads, for views scoped to one agent. Reading
+// the workspace-wide list and filtering it pulled 6k enrollments to keep a
+// handful. Chunked because Firestore caps `in` at 30 values; leadId alone uses
+// the automatic single-field index, like listLeadEnrollments.
+export async function listEnrollmentsForLeads(workspaceId: string, leadIds: string[]) {
+  const unique = [...new Set(leadIds.filter(Boolean))];
+  const chunks: string[][] = [];
+  for (let index = 0; index < unique.length; index += 30) {
+    chunks.push(unique.slice(index, index + 30));
+  }
+  const results = await Promise.all(
+    chunks.map((chunk) =>
+      collection<CampaignEnrollment>("campaignEnrollments").where("leadId", "in", chunk).get(),
+    ),
+  );
+  return results
+    .flatMap((snap) => snap.docs.map((doc) => doc.data()))
+    .filter((enrollment) => enrollment.workspaceId === workspaceId);
 }
 
 export async function listLeadEnrollments(workspaceId: string, leadId: string) {
