@@ -245,7 +245,7 @@ export function LinkedInAccountsSkeleton() {
 
 const PAGE_TITLE_CLASS =
   "text-2xl font-semibold leading-none tracking-tight text-[var(--md-sys-color-on-surface)]";
-const PAGE_FRAME_CLASS = "app-x flex h-full min-h-0 min-w-0 flex-col gap-3 md:ml-4 md:mr-0.5 md:pb-3";
+const PAGE_FRAME_CLASS = "app-x flex h-full min-h-0 min-w-0 flex-col gap-3 md:mr-0.5 md:pb-3";
 
 // Matches the Overview "Hot leads" rows (app-list-row, 32px avatar, fit
 // score). Returns bare <li>s: the view renders them inside its own list.
@@ -444,7 +444,7 @@ export function MessagesPageSkeleton() {
 
 export function AgentsPageSkeleton() {
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col gap-3 md:ml-4 md:pb-3">
+    <div className="flex h-full min-h-0 min-w-0 flex-col gap-3 md:pb-3">
       <div className="app-x hidden md:block">
         <PageHeaderSkeleton title="AI Agents">
           <Skeleton className="h-8 w-32" />
@@ -500,7 +500,7 @@ function FormPageSkeleton({
   children: ReactNode;
 }) {
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col gap-3 md:ml-4 md:mr-0.5" role="status" aria-label={`Loading ${title}`}>
+    <div className="flex h-full min-h-0 min-w-0 flex-col gap-3 md:mr-0.5" role="status" aria-label={`Loading ${title}`}>
       <div className="app-x hidden shrink-0 items-center justify-between gap-3 pt-6 md:flex">
         <div className="flex min-w-0 items-center gap-2.5">
           {headerLead}
@@ -674,7 +674,7 @@ export function AgentActionsSkeleton() {
 // Route loading state for /agents/[id]: the page header, then the queue.
 export function AgentPageSkeleton() {
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col gap-4 overflow-hidden md:ml-4 md:mr-0.5 md:pb-3">
+    <div className="flex h-full min-h-0 min-w-0 flex-col gap-4 overflow-hidden md:mr-0.5 md:pb-3">
       <div className="app-x flex shrink-0 items-start justify-between gap-3 pt-5 md:pt-6">
         <div className="min-w-0 flex-1">
           <Skeleton className="h-6 w-64 max-w-full" />

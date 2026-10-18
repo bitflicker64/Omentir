@@ -45,7 +45,7 @@ export default async function AgentActionsPage(props: { params: Promise<{ id: st
   // The header needs only the agent doc, so it paints right away; the queue
   // streams in behind its own skeleton.
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col gap-4 overflow-hidden md:ml-4 md:mr-0.5 md:pb-3">
+    <div className="flex h-full min-h-0 min-w-0 flex-col gap-4 overflow-hidden md:mr-0.5 md:pb-3">
       {/* Same header as the other app pages, with the agent card's
           View/Edit button pair on the right. */}
       <header className="app-x flex shrink-0 items-start justify-between gap-3 pt-5 md:pt-6">

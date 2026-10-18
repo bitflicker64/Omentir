@@ -728,7 +728,7 @@ export default function MessagesView({
   }
 
   return (
-    <div className="app-x flex h-full min-h-0 min-w-0 flex-col gap-3 md:ml-4 md:mr-0.5 md:pb-3">
+    <div className="app-x flex h-full min-h-0 min-w-0 flex-col gap-3 md:mr-0.5 md:pb-3">
       {/* Header */}
       <div className="contents md:flex md:shrink-0 md:items-center md:justify-between md:gap-3 md:pt-6">
         <div className="hidden min-w-0 md:block">

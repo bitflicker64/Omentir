@@ -558,7 +558,7 @@ export default function AgentsView({
   return (
     // Scroll lives on a full-width pane so the scrollbar sits at the right
     // edge of main (not inside app-x padding against the agent cards).
-    <div className="flex h-full min-h-0 min-w-0 flex-col gap-3 md:ml-4 md:pb-3">
+    <div className="flex h-full min-h-0 min-w-0 flex-col gap-3 md:pb-3">
       {/* Mobile app bar — full-height strip so the control is vertically centered
           in the 56px header (same bar as the sidebar title). */}
       <MobileHeaderPortal>

@@ -2574,7 +2574,7 @@ export default function AgentSetup({
         : "Continue";
 
   return (
-    <div className="app-x flex h-full min-h-0 min-w-0 flex-col gap-2 md:ml-4 md:mr-0.5 md:pb-3">
+    <div className="app-x flex h-full min-h-0 min-w-0 flex-col gap-2 md:mr-0.5 md:pb-3">
       <form
         id="agent-setup-form"
         onSubmit={handleSubmit}

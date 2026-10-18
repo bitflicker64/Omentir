@@ -524,7 +524,7 @@ export default function LeadsView({ groups, leads }: LeadsViewProps) {
   }
 
   return (
-    <div className="app-x flex h-full min-h-0 min-w-0 flex-col gap-3 md:ml-4 md:mr-0.5 md:pb-3">
+    <div className="app-x flex h-full min-h-0 min-w-0 flex-col gap-3 md:mr-0.5 md:pb-3">
       {/* Header */}
       <div className="hidden shrink-0 items-center justify-between gap-3 pt-6 md:flex">
         <div className="min-w-0">

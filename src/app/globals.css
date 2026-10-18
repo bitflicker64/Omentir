@@ -7763,8 +7763,10 @@ html:has(.dashboard-shell) .m3-dialog-btn {
   font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20;
 }
 
+/* App pages fill the panel with one small gutter. The old 1080px centered
+   cap left wide empty bands left and right on bigger screens. */
 .dashboard-shell.app-compact:not(:has(.auth-shell)) .app-x {
-  padding-inline: max(1.25rem, calc((100% - 1080px) / 2));
+  padding-inline: 1.25rem;
 }
 
 .dashboard-shell .stat-value {

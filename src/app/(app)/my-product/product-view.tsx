@@ -314,7 +314,7 @@ export default function ProductView({
     <form
       id="product-save-form"
       onSubmit={handleSave}
-      className="flex h-full min-h-0 min-w-0 flex-col gap-3 md:ml-4 md:mr-0.5"
+      className="flex h-full min-h-0 min-w-0 flex-col gap-3 md:mr-0.5"
     >
       <AiLoadingOverlay
         open={analyzing}
