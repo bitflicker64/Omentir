@@ -262,7 +262,6 @@ export const organizationJsonLd = {
   },
   sameAs: [
     "https://www.linkedin.com/company/121943897",
-    "https://x.com/OmentirAI",
     "https://github.com/vanshyadav1408/Omentir",
   ],
   contactPoint: {

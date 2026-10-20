@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { hostedContactEmail, hostedGithubRepo } from "@/lib/hosted-identity";
 import type { ReactNode } from "react";
-import { LinkedInMark, XMark } from "./brand-marks";
+import { LinkedInMark } from "./brand-marks";
 import IntegrationLogo from "./integrations/integration-logo";
 import LogoMark from "./logo-mark";
 import SiteThemeToggle from "./site-theme-toggle";
@@ -87,7 +87,6 @@ const footerColumns: Array<[string, ...Array<[label: string, href: string]>]> = 
 // Local mode never renders marketing shell (non-app routes 404).
 const footerSocialLinks = [
   { label: "LinkedIn", href: "https://www.linkedin.com/company/121943897" },
-  { label: "X", href: "https://x.com/OmentirAI" },
   { label: "GitHub", href: `https://github.com/${hostedGithubRepo()}` },
   { label: "Product Hunt", href: "https://www.producthunt.com/products/omentir" },
   { label: "Email", href: `mailto:${hostedContactEmail()}` },
@@ -132,7 +131,6 @@ function MailMark({ className }: { className?: string }) {
 
 const SOCIAL_ICONS: Record<string, (props: { className?: string }) => ReactNode> = {
   LinkedIn: LinkedInMark,
-  X: XMark,
   GitHub: GithubMark,
   "Product Hunt": ProductHuntMark,
   Email: MailMark,
