@@ -2179,11 +2179,21 @@ export async function findLinkedInChatWithAttendee(input: {
 }) {
   if (!isUnipileConfigured()) return null;
 
-  const result = await request<UnipileListResponse<UnipileChat> | UnipileChat[]>(
-    withQuery(`/api/v1/chat_attendees/${encodeURIComponent(input.providerProfileId)}/chats`, {
-      account_id: input.accountId,
-    }),
-  );
+  let result: UnipileListResponse<UnipileChat> | UnipileChat[];
+  try {
+    result = await request<UnipileListResponse<UnipileChat> | UnipileChat[]>(
+      withQuery(`/api/v1/chat_attendees/${encodeURIComponent(input.providerProfileId)}/chats`, {
+        account_id: input.accountId,
+      }),
+    );
+  } catch (error) {
+    // New connections can have no attendee until a chat exists. Only this
+    // specific absence means no history; other failures must block outreach.
+    if (error instanceof UnipileResponseError && error.status === 404 &&
+        error.errorType === "errors/resource_not_found" &&
+        /(?:^|\n)Attendee not found\.?$/i.test(error.detail?.trim() || "")) return null;
+    throw error;
+  }
   const chat = getListItems<UnipileChat>(result)
     .filter((item) => item.id && (!item.account_id || item.account_id === input.accountId))
     .sort((a, b) => Date.parse(b.timestamp || "") - Date.parse(a.timestamp || ""))[0];

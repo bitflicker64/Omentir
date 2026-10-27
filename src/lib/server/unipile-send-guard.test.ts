@@ -5,6 +5,9 @@ mock.module("./data", () => ({
   consumeAvatarViewBudget: async () => "exhausted",
   consumeProfileViewBudget: async () => true,
   listLinkedInAccounts: async () => [],
+  getConversation: async () => ({ messages: [] }),
+  listLeadEnrollments: async () => [],
+  stopLeadOutreach: async () => undefined,
 }));
 const originalFetch = globalThis.fetch;
 const originalEnv = { key: process.env.UNIPILE_API_KEY, dsn: process.env.UNIPILE_DSN };
@@ -22,9 +25,14 @@ globalThis.fetch = (async (url: RequestInfo | URL, init?: RequestInit) => {
     return Response.json({ message_id: "sent-message", chat_id: "chat" });
   }
   if (path === "/api/v1/users/person") return Response.json({ provider_id: "ACo-new-provider" });
+  if (path === "/api/v1/chat_attendees/ACo-old-provider/chats") return Response.json({
+    type: "errors/resource_not_found",
+    detail: "The requested resource were not found.\nAttendee not found",
+  }, { status: 404 });
   throw new Error(`Unexpected request: ${path}`);
 }) as typeof fetch;
 const { sendLinkedInMessage, LinkedInMessageSendBlocked } = await import("./unipile");
+const { stopForOwnerMessage } = await import("./owner-message-guard");
 const input = {
   accountId: "account", providerProfileId: "ACo-old-provider",
   linkedInUrl: "https://linkedin.com/in/person", body: "Scheduled message",
@@ -51,6 +59,21 @@ test("a failed history check also cannot send the message", async () => {
     ...input, beforeSend: async () => { throw new Error("History unavailable"); },
   })).rejects.toThrow("History unavailable");
   expect(posts).toHaveLength(0);
+});
+
+test("the real owner-message check permits a first send when Unipile has no attendee yet", async () => {
+  expect(await sendLinkedInMessage({
+    ...input,
+    beforeSend: async (providerProfileId) => {
+      const blocked = await stopForOwnerMessage({
+        workspaceId: "workspace", leadId: "lead", accountId: input.accountId,
+        providerProfileId, linkedInUrl: input.linkedInUrl,
+        allowLegacyAutomatedMessages: false,
+      }).catch(() => true);
+      if (blocked) throw new LinkedInMessageSendBlocked();
+    },
+  })).toEqual({ id: "sent-message", chatId: "chat" });
+  expect(posts).toHaveLength(1);
 });
 
 test("a verified history check runs before the POST, and the provider request bypasses Next's cache", async () => {

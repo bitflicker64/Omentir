@@ -255,4 +255,30 @@ describe("findLinkedInChatWithAttendee", () => {
       await findLinkedInChatWithAttendee({ accountId: "acc-1", providerProfileId: "ACoNobody" }),
     ).toBeNull();
   });
+
+  test("a new connection without an attendee record has no chat, so the first message is not blocked", async () => {
+    routes = { "/api/v1/chat_attendees/ACoNobody/chats": () => json({
+      type: "errors/resource_not_found",
+      detail: "The requested resource were not found.\nAttendee not found",
+    }, 404) };
+    expect(
+      await findLinkedInChatWithAttendee({ accountId: "acc-1", providerProfileId: "ACoNobody" }),
+    ).toBeNull();
+  });
+
+  test("unverified history failures are never mistaken for an absent conversation", async () => {
+    for (const [status, body] of [
+      [404, { type: "errors/resource_not_found", detail: "Account not found" }],
+      [404, { type: "errors/resource_not_found" }],
+      [404, { type: "errors/unknown", detail: "Attendee not found" }],
+      [401, { type: "errors/invalid_credentials" }],
+      [403, { type: "errors/disconnected_account" }],
+      [500, { type: "errors/unknown", detail: "Attendee not found" }],
+    ] as const) {
+      routes = { "/api/v1/chat_attendees/ACoNobody/chats": () => json(body, status) };
+      await expect(
+        findLinkedInChatWithAttendee({ accountId: "acc-1", providerProfileId: "ACoNobody" }),
+      ).rejects.toThrow(`Unipile request failed: ${status}`);
+    }
+  });
 });
