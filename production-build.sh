@@ -143,7 +143,10 @@ install_ci_prebuilt_next() {
   tgz=/tmp/omentir-prebuilt.tgz
   rm -f "$tgz"
   echo "Downloading CI-prebuilt .next from release vps-next-$APP_COMMIT_SHA" >&2
-  if curl -fL --retry 5 --retry-delay 2 -A omentir-deploy -o "$tgz" \
+  # HTTP/2 transfers can fail mid-download on this VPS. Retry bounded HTTP/1.1
+  # transfers before falling back to the Actions artifact.
+  if curl --http1.1 -fL --retry 3 --retry-all-errors --retry-delay 2 \
+    --retry-max-time 180 --connect-timeout 15 --max-time 180 -A omentir-deploy -o "$tgz" \
     "https://github.com/${APP_REPOSITORY}/releases/download/vps-next-${APP_COMMIT_SHA}/next-build.tgz" \
     && unpack_prebuilt_tgz "$tgz"
   then
@@ -166,16 +169,20 @@ install_ci_prebuilt_next() {
       "X-GitHub-Api-Version": "2022-11-28",
       "User-Agent": "omentir-deploy",
     };
-    const listed = await fetch(`https://api.github.com/repos/${repo}/actions/runs/${runId}/artifacts`, { headers });
+    const listed = await fetch(`https://api.github.com/repos/${repo}/actions/runs/${runId}/artifacts`, {
+      headers, signal: AbortSignal.timeout(30_000),
+    });
     if (!listed.ok) throw new Error(`list artifacts HTTP ${listed.status}`);
     const data = await listed.json();
     const artifact = (data.artifacts || []).find((row) => row.name === "next-build" && !row.expired);
     if (!artifact) throw new Error("next-build artifact missing");
-    const first = await fetch(artifact.archive_download_url, { headers, redirect: "manual" });
+    const first = await fetch(artifact.archive_download_url, {
+      headers, redirect: "manual", signal: AbortSignal.timeout(180_000),
+    });
     const redirected = first.status === 301 || first.status === 302 || first.status === 307 || first.status === 308;
     const zipUrl = redirected ? first.headers.get("location") : artifact.archive_download_url;
     if (!zipUrl) throw new Error("artifact download URL missing");
-    const zipRes = redirected ? await fetch(zipUrl) : first;
+    const zipRes = redirected ? await fetch(zipUrl, { signal: AbortSignal.timeout(180_000) }) : first;
     if (!zipRes.ok) throw new Error(`download artifact HTTP ${zipRes.status}`);
     await Bun.write("/tmp/omentir-prebuilt.zip", zipRes);
   '
